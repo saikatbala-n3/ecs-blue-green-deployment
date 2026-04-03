@@ -1,0 +1,47 @@
+{
+    "executionRoleArn": "arn:aws:iam::ACCOUNT_ID:role/p06-ecs-bg-dev-ecs-execution",
+    "containerDefinitions": [{
+        "name": "p06-ecs-bg-dev-app",
+        "image": "<IMAGE>",
+        "essential": true,
+        "portMappings": [{ 
+            "containerPort": 8000,
+            "protocol": "tcp"
+        }],
+        "environment": [
+            {
+                "name": "APP_VERSION",
+                "value": "VERSION"
+            },
+            {
+                "name": "ENVIRONMENT",
+                "value": "dev"
+            },
+            {
+                "name": "PORT",
+                "value": "8000"
+            }
+        ],
+        "logConfiguration": {
+            "logDriver": "awslogs",
+            "options": {
+                "awslogs-group": "/ecs/p06-ecs-bg-dev",
+                "awslogs-region": "ap-south-1",
+                "awslogs-stream-prefix": "app"
+            }
+        },
+        "healthCheck": {
+            "command": ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://localhost:8000/health')\" || exit 1"],
+            "interval": 30,
+            "timeout": 5,
+            "retries": 3,
+            "startPeriod": 10
+        }
+    }],
+    "requiresCompatibilities": ["FARGATE"],
+    "networkMode": "awsvpc",
+    "cpu": "256",
+    "memory": "512",
+    "family": "p06-ecs-bg-dev-app",
+    "taskRoleArn": "arn:aws:iam::ACCOUNT_ID:role/p06-ecs-bg-dev-ecs-task"
+}
